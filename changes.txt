@@ -1,0 +1,3 @@
+- to store the scores and fit gaussian.
+V1 - discarding the negative values
+V2 - very small values in place of negatives

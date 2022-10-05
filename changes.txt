@@ -1,3 +1,7 @@
 - to store the scores and fit gaussian.
 V1 - discarding the negative values
 V2 - very small values in place of negatives
+-----------------------------------------------------
+date : oct 5 : 
+
+1) Try to fit a gaussian on the points for matching and non-matchng and visualize it 

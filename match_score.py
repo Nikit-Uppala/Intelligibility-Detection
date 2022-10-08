@@ -3,19 +3,23 @@ import numpy as np
 
 def KL_diveregence(y, z, version):
     if version == 1: # taking abs value
-        return 1/2 * (np.sum(y * np.log(np.abs(y/z))) + np.sum(z * np.log(np.abs(z/y))))
+        y_pos = np.abs(y)
+        z_pos = np.abs(z)
     elif version == 2: # taking only positive values
         positives = (y >= 0) & (z >= 0)
         y_pos = y[positives]
         z_pos = z[positives]
-        return 1/2 * (np.sum(y_pos * np.log(y_pos/z_pos)) + np.sum(z * np.log(z_pos/y_pos)))
     elif version == 3: # replacing negative values with small value
-        eps = 1e-9
+        eps = 1e-6
         y_pos = y.copy()
         z_pos = z.copy()
         y_pos[y_pos < 0] = eps
         z_pos[z_pos < 0] = eps
-        return 1/2 * (np.sum(y_pos * np.log(y_pos/z_pos)) + np.sum(z * np.log(z_pos/y_pos)))
+    elif version == 4: # normalize the values between 0 and 1
+        eps = 1e-6
+        y_pos = (y - y.min()) / (y.max() - y.min()) + eps
+        z_pos = (z - z.min()) / (z.max() - z.min()) + eps
+    return 1/2 * (np.sum(y_pos * np.log(y_pos/z_pos)) + np.sum(z_pos * np.log(z_pos/y_pos)))
 
 
 '''

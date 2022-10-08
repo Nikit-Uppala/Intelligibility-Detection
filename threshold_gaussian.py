@@ -7,14 +7,14 @@ from scipy.stats import norm
 import sys
 
 
-def update_dist(list1, list2, matching_scores, non_matching_scores):
+def update_dist(list1, list2, matching_scores, non_matching_scores, version):
     for file1 in list1:
         type1 = "_".join(os.path.basename(file1).split("_")[1:])
         for file2 in tqdm.tqdm(list2):
             type2 = "_".join(os.path.basename(file2).split("_")[1:])
             arr1 = np.load(file1)[0]
             arr2 = np.load(file2)[0]
-            score = match_score(arr1, arr2)
+            score = match_score(arr1, arr2, version)
             if type1 == type2:
                 matching_scores.append(score)
             else:
@@ -43,11 +43,11 @@ def get_threshold(data_dir, version=1):
             for j in range(i+1, len(names)):
                 print(len(name_wise[names[i]]), len(name_wise[names[j]]))
                 update_dist(name_wise[names[i]], name_wise[names[j]],
-                            matching_scores, non_matching_scores)
+                            matching_scores, non_matching_scores, version)
     matching_scores = np.array(matching_scores)
     non_matching_scores = np.array(non_matching_scores)
-    np.save("matching_scores.npy", matching_scores)
-    np.save("non_matching_scores.npy", non_matching_scores)
+    np.save(f"matching_scores{version}.npy", matching_scores)
+    np.save(f"non_matching_scores{version}.npy", non_matching_scores)
     th_mean = (np.mean(matching_scores) + np.mean(non_matching_scores))/2
     m_mean, m_std = norm.fit(matching_scores)
     nm_mean, nm_std = norm.fit(non_matching_scores)
@@ -55,8 +55,8 @@ def get_threshold(data_dir, version=1):
     non_matching_x = np.linspace(np.min(non_matching_scores), np.max(non_matching_scores), 1000)
     matching_dist = norm.pdf(matching_x, m_mean, m_std)
     non_matching_dist = norm.pdf(non_matching_x, nm_mean, nm_std)
-    np.save("matching_gaussian.npy", matching_dist)
-    np.save("non_matching_gaussian.npy", non_matching_dist)
+    np.save(f"matching_gaussian{version}.npy", matching_dist)
+    np.save(f"non_matching_gaussian{version}.npy", non_matching_dist)
     # return th_inter, th_mean
 
 

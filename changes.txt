@@ -1,3 +1,10 @@
 - to store the scores and fit gaussian.
 V1 - discarding the negative values
 V2 - very small values in place of negatives
+
+
+## Some conclusions:
+total maching : 111
+total non-matching : 11990
+
+This was probably the reason why the plot matching was weird :-(

@@ -12,6 +12,8 @@ def update_dist(list1, list2, max_score, num_bins, matching_dist, non_matching_d
             type2 = "_".join(os.path.basename(file2).split("_")[1:])
             arr1 = np.load(file1)[0]
             arr2 = np.load(file2)[0]
+            arr1 = (arr1<=0)*0 + (arr1>0)*1 + 1e-6
+            arr2 = (arr2<=0)*0 + (arr2>0)*1 + 1e-6
             score = min(max_score, match_score(arr1, arr2))
             bin_num = int((num_bins-1) * score / max_score)
             if type1 == type2:
@@ -20,7 +22,7 @@ def update_dist(list1, list2, max_score, num_bins, matching_dist, non_matching_d
                 non_matching_dist[bin_num] += 1
 
 
-def get_threshold(data_dir, max_score=25, num_bins=2048):
+def get_threshold(data_dir, max_score=75, num_bins=2048):
     types = ["Intonation", "Phoneme", "Sentence", "Stress"]
     names = set(["jeeva", "anju"])
     matching_dist = np.zeros(num_bins)
@@ -28,6 +30,7 @@ def get_threshold(data_dir, max_score=25, num_bins=2048):
     for t in types[:1]:
         print(t)
         pattern = f"{data_dir}/*_{t}*.npy"
+        print(pattern)
         results = sorted(glob.glob(pattern))
         name_wise = {}
         for result in results:

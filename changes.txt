@@ -8,3 +8,7 @@ total maching : 111
 total non-matching : 11990
 
 This was probably the reason why the plot matching was weird :-(
+-----------------------------------------------------
+date : oct 5 : 
+
+1) Try to fit a gaussian on the points for matching and non-matchng and visualize it 

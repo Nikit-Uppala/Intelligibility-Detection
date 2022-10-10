@@ -26,15 +26,15 @@ def get_threshold(data_dir, version=1):
     names = set(["jeeva", "anju"])
     matching_scores = []
     non_matching_scores = []
-    for t in types[:1]:
+    for t in types[:1]: # to run on entire data: types[:1] to types
         print(t)
-        pattern = f"{data_dir}/*_{t}_L4*.npy"
+        pattern = f"{data_dir}/*_{t}_L4*.npy" # to run on entire data: f"{data_dir}/*_{t}_L4*.npy" to f"{data_dir}/*_{t}*.npy"
         results = sorted(glob.glob(pattern))
         name_wise = {}
         for result in results:
             filename = os.path.basename(result)
             name = filename.split("_")[0]
-            if name not in names: continue
+            if name not in names: continue # to run on entire data: comment this line
             if name not in name_wise:
                 name_wise[name] = []
             name_wise[name].append(result)

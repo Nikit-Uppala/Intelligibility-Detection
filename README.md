@@ -13,3 +13,5 @@
 
 Flow of exec:
 1) threshold_gaussian.py 
+
+Link for intersection of gaussians: https://stats.stackexchange.com/questions/311592/how-to-find-the-point-where-two-normal-distributions-intersect

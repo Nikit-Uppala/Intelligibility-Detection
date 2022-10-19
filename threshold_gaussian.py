@@ -35,15 +35,15 @@ def get_threshold(data_dir, version=1):
     names = set(["jeeva", "anju"])
     matching_scores = []
     non_matching_scores = []
-    for t in types[:1]: # to run on entire data: types[:1] to types
+    for t in types: # to run on entire data: types[:1] to types
         print(t)
-        pattern = f"{data_dir}/*_{t}_L4*.npy" # to run on entire data: f"{data_dir}/*_{t}_L4*.npy" to f"{data_dir}/*_{t}*.npy"
+        pattern = f"{data_dir}/*_{t}*.npy" # to run on entire data: f"{data_dir}/*_{t}_L4*.npy" to f"{data_dir}/*_{t}*.npy"
         results = sorted(glob.glob(pattern))
         name_wise = {}
         for result in results:
             filename = os.path.basename(result)
             name = filename.split("_")[0]
-            if name not in names: continue # to run on entire data: comment this line
+            # if name not in names: continue # to run on entire data: comment this line
             if name not in name_wise:
                 name_wise[name] = []
             name_wise[name].append(result)
@@ -53,23 +53,29 @@ def get_threshold(data_dir, version=1):
                 print(len(name_wise[names[i]]), len(name_wise[names[j]]))
                 update_dist(name_wise[names[i]], name_wise[names[j]],
                             matching_scores, non_matching_scores, version)
+    
     matching_scores = np.array(matching_scores)
     non_matching_scores = np.array(non_matching_scores)
-    np.save(f"matching_scores{version}.npy", matching_scores)
-    np.save(f"non_matching_scores{version}.npy", non_matching_scores)
-    th_mean = (np.mean(matching_scores) + np.mean(non_matching_scores))/2
+    np.save(f"results/matching_scores{version}.npy", matching_scores)
+    np.save(f"results/non_matching_scores{version}.npy", non_matching_scores)
+    
     m_mean, m_std = norm.fit(matching_scores)
     nm_mean, nm_std = norm.fit(non_matching_scores)
+    
     matching_x = np.linspace(np.min(matching_scores), np.max(matching_scores), 1000)
     non_matching_x = np.linspace(np.min(non_matching_scores), np.max(non_matching_scores), 1000)
     matching_dist = norm.pdf(matching_x, m_mean, m_std)
     non_matching_dist = norm.pdf(non_matching_x, nm_mean, nm_std)
-    np.save(f"matching_gaussian{version}.npy", matching_dist)
-    np.save(f"non_matching_gaussian{version}.npy", non_matching_dist)
+    np.save(f"results/matching_gaussian{version}.npy", matching_dist)
+    np.save(f"results/non_matching_gaussian{version}.npy", non_matching_dist)
+    
     #here we are calculating the average of both standard devantion means to find threshold 1
     th_mean = (nm_mean+m_mean)/2
     #here we are finding the second threshold
     th_inter = solve(m_mean,nm_mean,m_std,nm_std)[-1]
+    # saving results in a txt file
+    with open(f"results/threshold_{version}.txt", "w+") as file:
+        file.write(f"{th_inter} {th_mean}\n")
     return th_inter, th_mean 
 
 

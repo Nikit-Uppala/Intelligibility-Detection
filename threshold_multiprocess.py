@@ -23,10 +23,12 @@ def get_score(args):
 
 
 def update_dist(list1, list2, matching_scores, non_matching_scores, num_cores, version):
+    #N_arguments passed are name_wise[names[i]], name_wise[names[j]],matching_scores, non_matching_scores, num_cores, version
+
     args = [] # args for each process are stored in this list (file1, file2, version)
     same = [] # tells whether the score should be added in matching scores or non_matching scores
     for file1 in list1:
-        type1 = "_".join(os.path.basename(file1).split("_")[1:]) # word related information
+        type1 = "_".join(os.path.basename(file1).split("_")[1:]) # word related information #N_ what information ?
         for file2 in list2:
             type2 = "_".join(os.path.basename(file2).split("_")[1:]) # word related information
             if type1 == type2: # The utteranances in both the files is of the same word
@@ -71,7 +73,7 @@ def get_threshold(data_dir, num_cores=1, version=1):
     for t in types: # to run on entire data: types[:1] to types
         print(t)
         pattern = f"{data_dir}/*_{t}*.npy" # to run on entire data: f"{data_dir}/*_{t}_L4*.npy" to f"{data_dir}/*_{t}*.npy"
-        results = sorted(glob.glob(pattern))
+        results = sorted(glob.glob(pattern)) #N_what are results ? 
         name_wise = {} # stores the files related to each speaker.
         for result in results:
             filename = os.path.basename(result)
@@ -86,6 +88,7 @@ def get_threshold(data_dir, num_cores=1, version=1):
         for i in range(len(names)):
             for j in range(i+1, len(names)):
                 print(names[i], names[j])
+                #N_the kl d
                 update_dist(name_wise[names[i]], name_wise[names[j]],
                             matching_scores, non_matching_scores, num_cores, version)
     

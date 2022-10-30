@@ -2,7 +2,7 @@ import numpy as np
 from match_score import match_score
 import glob
 import os
-import tqdm
+#import tqdm
 from scipy.stats import norm
 import sys
 import multiprocessing as mp
@@ -70,9 +70,9 @@ def get_threshold(data_dir, num_cores=1, version=1):
     matching_scores = []
     non_matching_scores = []
     
-    for t in types: # to run on entire data: types[:1] to types
+    for t in types[:1]: # to run on entire data: types[:1] to types
         print(t)
-        pattern = f"{data_dir}/*_{t}*.npy" # to run on entire data: f"{data_dir}/*_{t}_L4*.npy" to f"{data_dir}/*_{t}*.npy"
+        pattern = f"{data_dir}/*_{t}_L4*.npy" # to run on entire data: f"{data_dir}/*_{t}_L4*.npy" to f"{data_dir}/*_{t}*.npy"
         results = sorted(glob.glob(pattern)) #N_what are results ? 
         name_wise = {} # stores the files related to each speaker.
         for result in results:
@@ -118,7 +118,8 @@ def get_threshold(data_dir, num_cores=1, version=1):
 
 
 if __name__ == "__main__":
-    data_dir = "data/sentencewise_features" # the path to the directory which contains our vector files
+    #data_dir = "data/sentencewise_features" # the path to the directory which contains our vector files
+    data_dir="/media/nayan/z/wav2vec2_implementaions/wav2vec2_features_for_student_dataset/sentencewise_features"
     num_cores = os.cpu_count() # number of cores to use (number of processes to run in parallel (max possible: number of cores on the cpu))
     if len(sys.argv) > 1:
         num_cores = min(num_cores, int(sys.argv[1]))

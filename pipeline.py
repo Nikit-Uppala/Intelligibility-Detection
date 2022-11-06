@@ -11,7 +11,7 @@ from intelligibility_detection import is_intelligible
 #as of now we need to add the threshold manually in the code.( we plan to change it )
 #preserve the result file named (venkatt_1.csv) and  (anju_1.csv) before re-running the code for the second threshold as the code will overwrite the files.
 
-def get_results(data_dir, df, test_speakers, test_speaker, version):
+def get_results(data_dir, df, test_speakers, test_speaker, threshold, version):
     # to run it for all files replace f"{data_dir}/{test_speaker}_Intonation_L4*.npy" with f"{data_dir}/{test_speaker}*.npy"
     #we are currently running it for only intonation L4 files as we computed the threshold for intonation L4 files only.
     test_speaker_files = sorted(glob.glob(f"{data_dir}/{test_speaker}_Intonation_L4*.npy"))#pulls all the files related to the test speaker
@@ -33,7 +33,7 @@ def get_results(data_dir, df, test_speakers, test_speaker, version):
                 if df[os.path.basename(file).split(".")[0].lower()] == 0:
                     control_speaker_features.append(np.load(file)[0])
 
-        results.append(is_intelligible(test_speaker_features, control_speaker_features, 39.666278339003966, version)) #last 2 agruments are threshold and version ( we need to run the code for both threshold)
+        results.append(is_intelligible(test_speaker_features, control_speaker_features, threshold, version)) #last 2 agruments are threshold and version ( we need to run the code for both threshold)
         # results.append(is_intelligible(test_speaker_features, control_speaker_features, 35.268212728056746, num_cores, version))
     filenames = [os.path.basename(x) for x in test_speaker_files]
     final_result = {
@@ -52,10 +52,14 @@ def main():
     data_dir = "/media/nayan/z/wav2vec2_implementaions/wav2vec2_features_for_student_dataset/sentencewise_features" # path to the directory which contains our data files
     test_speakers = set(["venkatt", "anju"]) # list of speakers not included in the control speaker set (as venkatt's speech is non-intelligible ans anju is to test the code) 
     version = 1 # version of match_score being used
-    for test_speaker in sorted(test_speakers):
-        result = get_results(data_dir, df, test_speakers, test_speaker, version) # results for each speaker are written to respective files.
-        result_df = pd.DataFrame(result)
-        result_df.to_csv(f"results/{test_speaker}_{version}.csv", index=False, header=False)
+    with open(f"results/threshold_{version}.txt", "r") as file:
+        data = file.read().strip().split()
+        thresholds = {"inter": float(data[0]), "mean": float(data[1])}
+    for threshold_type in thresholds:
+        for test_speaker in sorted(test_speakers):
+            result = get_results(data_dir, df, test_speakers, test_speaker, thresholds[threshold_type], version) # results for each speaker are written to respective files.
+            result_df = pd.DataFrame(result)
+            result_df.to_csv(f"results/{test_speaker}_{version}_{threshold_type}.csv", index=False, header=False)
         
 
 if __name__ == '__main__':

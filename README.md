@@ -4,6 +4,9 @@
 
 1) threshold_gaussian.py : - Sets the threshold for overlap of gaussians
 2) threshold_multiprocess.py : - Calculates the threshold using multiprocessing.
+3) match_score.py : - Calculates the matching score for vectors of two utterances.
+4) intelligibility_detection.py : - Functions to check whether the vector of a given utterance is intelligible or not using vectors of control utterances.
+5) plot_gaussians.py : - Plots the gaussians obtained.
 
 To run: python threshold_multiprocess.py <number_of_cores> <version_of_match_score>. If the parameters are not mentioned, then number of cores = os.cpu_count() and version=1. 
 

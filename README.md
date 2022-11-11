@@ -7,6 +7,7 @@
 3) match_score.py : - Calculates the matching score for vectors of two utterances.
 4) intelligibility_detection.py : - Functions to check whether the vector of a given utterance is intelligible or not using vectors of control utterances.
 5) plot_gaussians.py : - Plots the gaussians obtained.
+6) script.py : - Gets the normalized scores and clipped scores (between -3 x sigma to 3 x sigma)
 
 To run: python threshold_multiprocess.py <number_of_cores> <version_of_match_score>. If the parameters are not mentioned, then number of cores = os.cpu_count() and version=1. 
 

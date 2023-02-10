@@ -4,8 +4,10 @@ import sys
 import glob
 from scipy.stats import norm
 
-
 def main():
+    """This function is used to plot the gaussians, with respect to the arguments given, the data to plot gaussian is saved in
+    results folder.  
+    """
     matching_files = sorted(glob.glob(f"results/matching_{'' if scores_type is None else scores_type+'_'}scores*.npy"))
     non_matching_files = sorted(glob.glob(f"results/non_matching_{'' if scores_type is None else scores_type+'_'}scores*.npy"))
     assert len(matching_files) == len(non_matching_files)
@@ -15,7 +17,6 @@ def main():
         "Replacing negative with small values (near zero)",
         "Normalizing between 0 and 1"
     )
-
     fig, ax = plt.subplots(len(matching_files), figsize=(14, 5 * len(matching_files)))
     for i in range(len(matching_files)):
         matching_scores = np.load(matching_files[i])
@@ -39,7 +40,14 @@ def main():
 
 
 if __name__ == "__main__":
+    """The input to this include two type, normalised and clipped, this is done as the paper doe calculation on probability distribution
+    whereas the one we had was, features and they could be negative.
+    """
     scores_type = None
     if len(sys.argv) > 1:
-        scores_type = sys.argv[1] # normalized, clipped
+        # Three types of arguments that is none,normalized, clipped
+        # None will use the same data as provided, 
+        # normalised will normalise the data between 0-1
+        # clipped will clip the data to mean-3*sd and mean+3*sd
+        scores_type = sys.argv[1] 
     main()

@@ -1,13 +1,22 @@
-import numpy as np
 from match_score import match_score
-import glob
-import os
-import tqdm
 from scipy.stats import norm
+import numpy as np
+import glob
+import tqdm
 import sys
+import os
 
 
 def update_dist(list1, list2, matching_scores, non_matching_scores, version):
+    """update the matching and non matching distribution.
+
+    Args:
+        list1 (list): list of 1st features.
+        list2 (list): list of 2nd features.
+        matching_scores (list): list for storing matching score.
+        non_matching_scores (list): list for storing the non matching score.
+        version (int): see match source for more information. Defaults to 1.
+    """
     for file1 in list1:
         type1 = "_".join(os.path.basename(file1).split("_")[1:])
         for file2 in tqdm.tqdm(list2):
@@ -20,8 +29,18 @@ def update_dist(list1, list2, matching_scores, non_matching_scores, version):
             else:
                 non_matching_scores.append(score)
 
-
 def solve(m1,m2,std1,std2):
+    """Used methamatical formula to calculate the intersection.
+
+    Args:
+        m1 (float): mean of 1st distribution.
+        m2 (float): mean of 2nd distribution.
+        std1 (float): standard distribution of 1st distribution.
+        std2 (float): standard distribution of 2nd distribution.
+
+    Returns:
+       float : intersection point
+    """
     # the method id to solve the gaussian eqautions to find the roots where ever it 
     # intersects , i.e give roots of the equation.
     a = 1/(2*std1**2) - 1/(2*std2**2)
@@ -34,22 +53,38 @@ def solve(m1,m2,std1,std2):
 
 
 def get_threshold(data_dir, version=1):
+    """This is used to calculate the Threshold
+
+    Args:
+        data_dir (string): path of the directory containing data source directory.
+        version (int, optional): see match source for more information. Defaults to 1.
+
+    Returns:
+        tuple: (threshold interaction, threshold mean)
+    """
+    # There were four types of files as given below and the nomenclature of them was also like that.
+    '''Change the type and name of the files that you want to include in the threshold calculation
+    '''
     types = ["Intonation", "Phoneme", "Sentence", "Stress"]
-    names = set(["jeeva", "anju"])
+    # names = set(["jeeva", "anju"])
     matching_scores = []
     non_matching_scores = []
-    for t in types: # to run on entire data: types[:1] to types
+    for t in types:
         print(t)
-        pattern = f"{data_dir}/*_{t}*.npy" # to run on entire data: f"{data_dir}/*_{t}_L4*.npy" to f"{data_dir}/*_{t}*.npy"
+        # the below line finds the files of type t and this is used to extract the file path and load them
+        pattern = f"{data_dir}/*_{t}*.npy" 
         results = sorted(glob.glob(pattern))
         name_wise = {}
         for result in results:
             filename = os.path.basename(result)
             name = filename.split("_")[0]
-            # if name not in names: continue # to run on entire data: comment this line
+            # to run on entire data: comment this line
+            # if name not in names: continue
             if name not in name_wise:
                 name_wise[name] = []
             name_wise[name].append(result)
+        '''Remove the below names, if you don't want all the names to be considered comment the below line
+        '''
         names = sorted(list(name_wise.keys()))
         for i in range(len(names)):
             for j in range(i+1, len(names)):
@@ -59,6 +94,7 @@ def get_threshold(data_dir, version=1):
     
     matching_scores = np.array(matching_scores)
     non_matching_scores = np.array(non_matching_scores)
+    # the calculated scores are saved below
     np.save(f"results/matching_scores{version}.npy", matching_scores)
     np.save(f"results/non_matching_scores{version}.npy", non_matching_scores)
     
@@ -69,6 +105,7 @@ def get_threshold(data_dir, version=1):
     non_matching_x = np.linspace(np.min(non_matching_scores), np.max(non_matching_scores), 1000)
     matching_dist = norm.pdf(matching_x, m_mean, m_std)
     non_matching_dist = norm.pdf(non_matching_x, nm_mean, nm_std)
+    # The below data is used to create,
     np.save(f"results/matching_gaussian{version}.npy", matching_dist)
     np.save(f"results/non_matching_gaussian{version}.npy", non_matching_dist)
     
@@ -83,8 +120,9 @@ def get_threshold(data_dir, version=1):
 
 
 if __name__ == "__main__":
+    '''change the directory containing the dataset below
+    '''
     data_dir = "data/sentencewise_features" # the path to the directory which contains our vector files
     version = 1
-    if len(sys.argv) > 1:
-        version = int(sys.argv[1])
+    if len(sys.argv) > 1: version = int(sys.argv[1])
     get_threshold(data_dir, version)

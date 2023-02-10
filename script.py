@@ -5,6 +5,15 @@ from threshold_gaussian import solve
 
 
 def normalized_scores(m_scores, nm_scores):
+    """This function normalises the score between zeros and one
+
+    Args:
+        m_scores (nparray): matching scores
+        nm_scores (_type_): non matching scores
+
+    Returns:
+        tuple: normalised maching score, normalised non macthing scores
+    """
     mini = min(np.min(m_scores), np.min(nm_scores))
     maxi = max(np.max(m_scores), np.max(nm_scores))
     m_norm_scores = (m_scores-mini) / (maxi-mini)
@@ -12,13 +21,33 @@ def normalized_scores(m_scores, nm_scores):
     return m_norm_scores, nm_norm_scores
 
 def clip(scores):
+    """This is just used to clip the farther points, so as to remove outliers.
+
+    Args:
+        scores (nparray): contains the score values that we generated 
+
+    Returns:
+        nparray: clipped scores
+    """
     std = np.std(scores)
     mean = np.mean(scores)
     clipped_scores = scores[(scores > mean - 3 * std) & (scores < mean + 3 * std)]
     return clipped_scores
 
-
 def get_thresholds(m_scores, nm_scores):
+    """This function takes the two scores, that is matching and non-matching and returns
+    two types of thresholds -
+    1. Mean Threshold - Taken by taking the mean of both gaussian distributions
+    2. Intersection Threshold - Got but finding the intersection of both matching and non-
+    matching gaussian distributions. 
+
+    Args:
+        m_scores (nparray): matching scores
+        nm_scores (nparray): non matching scores
+
+    Returns:
+        tuple: mean_threshold, intersection_threshold
+    """
     m_mean, m_std = norm.fit(m_scores)
     nm_mean, nm_std = norm.fit(nm_scores)
     th_mean = (m_mean + nm_mean) / 2

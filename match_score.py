@@ -2,6 +2,17 @@ import numpy as np
 
 
 def KL_diveregence(y, z, version):
+    """This function calculates the KL divergence, according to Equation-2, in the paper. 
+    Utterance Verification-Based Dysarthric Speech Intelligibility Assessment Using Phonetic Posterior Features
+
+    Args:
+        y (nparray): posterior features of reference speech (list)
+        z (nparray): posterior features of test speech (list)
+        version (int): method of processing -ve values, for more details se the comments in the function
+
+    Returns:
+        float: local match score computed as symmetric Kullback-Leibler divergence between y and z
+    """
     if version == 1: # taking abs value
         y_pos = np.abs(y)
         z_pos = np.abs(z)
@@ -22,13 +33,17 @@ def KL_diveregence(y, z, version):
     return 1/2 * (np.sum(y_pos * np.log(y_pos/z_pos)) + np.sum(z_pos * np.log(z_pos/y_pos)))
 
 
-'''
-    This function returns the intelligibility score between Z and Y.
-    Arguments:
-        Z: posterior features of test speech (list)
-        Y: posterior features of reference speech (list)
-'''
 def match_score(Y, Z, version=1):
+    """This function returns the accumulated match score (inteligibility score) between Z and Y.
+
+    Args:
+        Y (list): posterior features of reference speech
+        Z (list): posterior features of test speech
+        version (int, optional): _description_. Defaults to 1.
+
+    Returns:
+        float: accumulated match score (inteligibility score)
+    """
     M, N = len(Y), len(Z)
     L = np.zeros((M, N))
     L[0, 0] = KL_diveregence(Y[0], Z[0], version)

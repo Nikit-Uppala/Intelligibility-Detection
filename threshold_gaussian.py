@@ -66,16 +66,16 @@ def get_threshold(data_dir, version=1):
     '''Change the type and name of the files that you want to include in the threshold calculation
     '''
     types = ["Intonation", "Phoneme", "Sentence", "Stress"]
-    # names = set(["jeeva", "anju"])
+    names = list(["jeeva", "anju"])
     matching_scores = []
     non_matching_scores = []
     for t in types:
         print(t)
         # the below line finds the files of type t and this is used to extract the file path and load them
-        pattern = f"{data_dir}/*_{t}*.npy" 
-        results = sorted(glob.glob(pattern))
+        pattern = f"{data_dir}/*_{t}_L4*.npy" 
+        results_other = sorted(glob.glob(pattern))
         name_wise = {}
-        for result in results:
+        for result in results_other:
             filename = os.path.basename(result)
             name = filename.split("_")[0]
             # to run on entire data: comment this line
@@ -85,36 +85,38 @@ def get_threshold(data_dir, version=1):
             name_wise[name].append(result)
         '''Remove the below names, if you don't want all the names to be considered comment the below line
         '''
-        names = sorted(list(name_wise.keys()))
+        # names = sorted(list(name_wise.keys()))
         for i in range(len(names)):
             for j in range(i+1, len(names)):
-                print(len(name_wise[names[i]]), len(name_wise[names[j]]))
-                update_dist(name_wise[names[i]], name_wise[names[j]],
+                try: 
+                    print(len(name_wise[names[i]]), len(name_wise[names[j]]))
+                    update_dist(name_wise[names[i]], name_wise[names[j]],
                             matching_scores, non_matching_scores, version)
+                except: pass
     
     matching_scores = np.array(matching_scores)
     non_matching_scores = np.array(non_matching_scores)
     # the calculated scores are saved below
-    np.save(f"results/matching_scores{version}.npy", matching_scores)
-    np.save(f"results/non_matching_scores{version}.npy", non_matching_scores)
+    np.save(f"results_other/matching_scores{version}.npy", matching_scores)
+    np.save(f"results_other/non_matching_scores{version}.npy", non_matching_scores)
     
     m_mean, m_std = norm.fit(matching_scores)
     nm_mean, nm_std = norm.fit(non_matching_scores)
-    
+    print(len(matching_scores),len(non_matching_scores))
     matching_x = np.linspace(np.min(matching_scores), np.max(matching_scores), 1000)
     non_matching_x = np.linspace(np.min(non_matching_scores), np.max(non_matching_scores), 1000)
     matching_dist = norm.pdf(matching_x, m_mean, m_std)
     non_matching_dist = norm.pdf(non_matching_x, nm_mean, nm_std)
     # The below data is used to create,
-    np.save(f"results/matching_gaussian{version}.npy", matching_dist)
-    np.save(f"results/non_matching_gaussian{version}.npy", non_matching_dist)
+    np.save(f"results_other/matching_gaussian{version}.npy", matching_dist)
+    np.save(f"results_other/non_matching_gaussian{version}.npy", non_matching_dist)
     
     #here we are calculating the average of both standard devantion means to find threshold 1
     th_mean = (nm_mean+m_mean)/2
     #here we are finding the second threshold
     th_inter = solve(m_mean,nm_mean,m_std,nm_std)
-    # saving results in a txt file
-    with open(f"results/threshold_{version}.txt", "w+") as file:
+    # saving results_other in a txt file
+    with open(f"results_other/threshold_{version}.txt", "w+") as file:
         file.write(f"{th_inter} {th_mean}\n")
     return th_inter, th_mean 
 
@@ -122,7 +124,7 @@ def get_threshold(data_dir, version=1):
 if __name__ == "__main__":
     '''change the directory containing the dataset below
     '''
-    data_dir = "data/sentencewise_features" # the path to the directory which contains our vector files
+    data_dir = "../student_resampled_wav/" # the path to the directory which contains our vector files
     version = 1
     if len(sys.argv) > 1: version = int(sys.argv[1])
     get_threshold(data_dir, version)

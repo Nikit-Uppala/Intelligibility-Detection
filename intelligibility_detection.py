@@ -21,7 +21,8 @@ def is_intelligible(Z_w, Y_w, threshold, version=1):
         score = match_score(Y_wk, Z_w, version)
         if score <= threshold:
             num_votes += 1
-    
+    # print(num_votes)
+    # print(K)
     if num_votes >= np.ceil(K / 2): return True
     return False
 

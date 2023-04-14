@@ -29,9 +29,9 @@ def KL_diveregence(y, z, version):
         eps = 1e-6
         y_pos = (y - y.min()) / (y.max() - y.min()) + eps
         z_pos = (z - z.min()) / (z.max() - z.min()) + eps
-    # return 1/2 * (np.sum(y_pos * np.log(y_pos/z_pos)) + np.sum(z_pos * np.log(z_pos/y_pos)))
+    return 1/2 * (np.sum(y_pos * np.log(y_pos/z_pos)) + np.sum(z_pos * np.log(z_pos/y_pos)))
     # return np.mean(np.abs(y_pos - z_pos))
-    return np.square(np.subtract(y_pos, z_pos)).mean()
+    # return np.square(np.subtract(y_pos, z_pos)).mean()
 
 
 

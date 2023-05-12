@@ -24,15 +24,20 @@ def combine_files(folder,outputfileloc,version):
     files_inter = list(filter(lambda x:(x.split('.')[-1]=='csv' and 'inter' in x.split('_') and version == int(x.split('_')[1])),os.listdir(folder)))
     arr = np.array([])
     for i in files_mean:
-        df = pd.read_csv(os.path.join(folder,i)).to_numpy()
-        if(arr.__len__()<=1): arr = df
-        else: arr = np.concatenate((arr,df))
+        try:
+            df = pd.read_csv(os.path.join('temp',i)).to_numpy()
+            if(arr.__len__()<=1): arr = df
+            else: arr = np.concatenate((arr,df))
+        except: pass
     final = pd.DataFrame(arr)
     final.to_csv(os.path.join(folder,outputfileloc+'_mean.csv'),index=False,header=False)
+    arr = np.array([])
     for i in files_inter:
-        df = pd.read_csv(os.path.join(folder,i)).to_numpy()
-        if(arr.__len__()<=1): arr = df
-        else: arr = np.concatenate((arr,df))
+        try:
+            df = pd.read_csv(os.path.join(folder,i)).to_numpy()
+            if(arr.__len__()<=1): arr = df
+            else: arr = np.concatenate((arr,df))
+        except: pass
     final = pd.DataFrame(arr)
     final.to_csv(os.path.join(folder,outputfileloc+'_inter.csv'),index=False,header=False)
 

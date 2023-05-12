@@ -1,8 +1,0 @@
-For intelligibility : 82.23% , for mean it increased a bit to 82.92
-For phenome : 46.11% (after calculating threshold specially for Phoneme)
-For Intonation : 39.73% (after calculating threshold using just Intonation Files)
-For Stress : 60.21% (after calculating threshold using just Stress Files)
-For Mispronunciation : 59.64%
-For Pause Placement : 35.81%
-
-If the above ones are calculated using threshold using all files, they were coming in between 36-42%.

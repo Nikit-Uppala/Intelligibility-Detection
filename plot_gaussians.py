@@ -6,10 +6,10 @@ from scipy.stats import norm
 
 def main():
     """This function is used to plot the gaussians, with respect to the arguments given, the data to plot gaussian is saved in
-    results folder.  
+    results_real2 folder.  
     """
-    matching_files = sorted(glob.glob(f"results/matching_{'' if scores_type is None else scores_type+'_'}scores*.npy"))
-    non_matching_files = sorted(glob.glob(f"results/non_matching_{'' if scores_type is None else scores_type+'_'}scores*.npy"))
+    matching_files = sorted(glob.glob(f"results_real2/matching_{'' if scores_type is None else scores_type+'_'}scores*.npy"))
+    non_matching_files = sorted(glob.glob(f"results_real2/non_matching_{'' if scores_type is None else scores_type+'_'}scores*.npy"))
     assert len(matching_files) == len(non_matching_files)
     fig, ax = plt.subplots(len(matching_files), figsize=(14, 5 * len(matching_files)))
     print(len(matching_files))

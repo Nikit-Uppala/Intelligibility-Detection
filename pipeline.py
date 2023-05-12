@@ -11,7 +11,7 @@ from intelligibility_detection import is_intelligible
 # from intelligibility_detection_multiprocess import is_intelligible
 #This file needs to be run twice for both the thresholds one by one and the results are written to respective files
 #as of now we need to add the threshold manually in the code.( we plan to change it )
-#preserve the result file named (venkatt_1.csv) and  (anju_1.csv) before re-running the code for the second threshold as the code will overwrite the files.
+#preserve the result file named (venkatt_1.csv) and (anju_1.csv) before re-running the code for the second threshold as the code will overwrite the files.
 
 def CorrectFileName(val):
     parts = val.split('_')
@@ -20,6 +20,13 @@ def CorrectFileName(val):
         if(len(splitit)==1): parts[3]=str(int(parts[3]))
         else: parts[3]=str(int(splitit[0]))+'-'+str(int(splitit[1]))
     return '_'.join(parts)
+
+def correctbasename(name):
+    a = name.split('-')
+    # print(a)
+    b = ('-'.join(a[:-2]))+'_'+('_'.join([a[-2],a[-1]]))
+    # print(b)
+    return b
 
 def get_results(data_dir, df, test_speakers, test_speaker, threshold, threshold_type, version):
     """Function to find the intelligibity of test speakers, here we have done it for Intonation_L4 (present in previous dataset)
@@ -31,7 +38,6 @@ def get_results(data_dir, df, test_speakers, test_speaker, threshold, threshold_
         test_speaker (string): current test speaker, who's intelligibility we want to find.
         threshold (float): the threshold
         version (int): see the match score for more distription
-
     Returns:
         dict: file name along with the intelligibity values 
     """
@@ -57,12 +63,12 @@ def get_results(data_dir, df, test_speakers, test_speaker, threshold, threshold_
                 test_speaker_features = np.load(file)[0]
             else:
                 # if for other speckers the file is intelligible then add it to the control speaker set else not
-                using_name = CorrectFileName(os.path.basename(file).split(".")[0].lower())
-                # print(using_name)
+                using_name = CorrectFileName(os.path.basename(file).split(".")[0].lower())+'.npy'
+                # print(using_name, using_name not in df)
                 if (using_name not in df): continue
-                if int(df[using_name]) == 1: control_speaker_features.append(np.load(file)[0])
+                if int(df[using_name]) == 0: control_speaker_features.append(np.load(file)[0])
         results.append(is_intelligible(test_speaker_features, control_speaker_features, threshold, version)) #last 2 agruments are threshold and version ( we need to run the code for both threshold)
-        # print(len(results))
+        # print(len(results)nandini","vijje","venkatt","bharati","kiru")
         # if(len(results)>=100 and len(filenames[i:i+len(results)])==len(results)):
         #     data = {
         #         "filename": filenames[i:i+len(results)],
@@ -88,20 +94,19 @@ def main():
     respective .csv files.
     """
     # A csv file which contains filename, not_intelligible
-    df = pd.read_csv("data.csv", header=None)
+    df = pd.read_csv("newdata.csv", header=None)
     df = df.values.tolist()
     # A dictionary with filename as key and not_intelligible as value
     #NOTE
     df = { x[0].strip().lower(): x[1] for x in df }
     # path to the directory which contains our data files
-    data_dir = "../shampled_wav/test" 
+    data_dir = "../shampled_wav4/test" 
     # list of speakers not included in the control speaker set (as venkatt's speech is non-intelligible and anju is to test the code) 
-    test_speakers = set(["maheshaa","triesa","bibin","stephy","venktapa","vishal1",
-                         "madhavi","Sunitha","nandini","vijje","venkatt","bharati","kiru"]) 
+    test_speakers = set(["jeeva","anju"]) 
     # version of match_score being used
     #NOTE
-    version = 4
-    with open(f"results/threshold_normalized1.txt", "r") as file:
+    version = 1
+    with open(f"results_mae/threshold_1.txt", "r") as file:
         data = file.read().strip().split()
         thresholds = {"inter": float(data[0]), "mean": float(data[1])}
     for threshold_type in thresholds:

@@ -6,7 +6,6 @@ import tqdm
 import sys
 import os
 
-
 def update_dist(list1, list2, matching_scores, non_matching_scores, version):
     """update the matching and non matching distribution.
 
@@ -18,12 +17,21 @@ def update_dist(list1, list2, matching_scores, non_matching_scores, version):
         version (int): see match source for more information. Defaults to 1.
     """
     for file1 in list1:
-        type1 = "_".join(os.path.basename(file1).split("_")[1:])
+        try:
+            type1 = "_".join(os.path.basename(file1).split("_")[1:])
+            # type1 = type1.split('.')[0].split('_')[-1].split('-')[-2]
+            type1 = type1.split('.')[0].split('_')[-2]
+        except: continue
         for file2 in tqdm.tqdm(list2):
-            type2 = "_".join(os.path.basename(file2).split("_")[1:])
+            try:
+                type2 = "_".join(os.path.basename(file2).split("_")[1:])
+                # type2 = type2.split('.')[0].split('_')[-1].split('-')[-2]
+                type2 = type2.split('.')[0].split('_')[-2]
+            except: continue
             arr1 = np.load(file1)[0]
             arr2 = np.load(file2)[0]
             score = match_score(arr1, arr2, version)
+            # print(type1,type2)
             if type1 == type2:
                 matching_scores.append(score)
             else:
@@ -72,10 +80,10 @@ def get_threshold(data_dir, version=1):
     for t in types:
         print(t)
         # the below line finds the files of type t and this is used to extract the file path and load them
-        pattern = f"{data_dir}/*_{t}_L4*.npy" 
-        results_other = sorted(glob.glob(pattern))
+        pattern = f"{data_dir}/*{t}*.npy" 
+        results_mae = sorted(glob.glob(pattern))
         name_wise = {}
-        for result in results_other:
+        for result in results_mae:
             filename = os.path.basename(result)
             name = filename.split("_")[0]
             # to run on entire data: comment this line
@@ -86,6 +94,7 @@ def get_threshold(data_dir, version=1):
         '''Remove the below names, if you don't want all the names to be considered comment the below line
         '''
         # names = sorted(list(name_wise.keys()))
+        # print(names)
         for i in range(len(names)):
             for j in range(i+1, len(names)):
                 try: 
@@ -97,8 +106,8 @@ def get_threshold(data_dir, version=1):
     matching_scores = np.array(matching_scores)
     non_matching_scores = np.array(non_matching_scores)
     # the calculated scores are saved below
-    np.save(f"results_other/matching_scores{version}.npy", matching_scores)
-    np.save(f"results_other/non_matching_scores{version}.npy", non_matching_scores)
+    np.save(f"results_mae/matching_scores{version}.npy", matching_scores)
+    np.save(f"results_mae/non_matching_scores{version}.npy", non_matching_scores)
     
     m_mean, m_std = norm.fit(matching_scores)
     nm_mean, nm_std = norm.fit(non_matching_scores)
@@ -108,23 +117,23 @@ def get_threshold(data_dir, version=1):
     matching_dist = norm.pdf(matching_x, m_mean, m_std)
     non_matching_dist = norm.pdf(non_matching_x, nm_mean, nm_std)
     # The below data is used to create,
-    np.save(f"results_other/matching_gaussian{version}.npy", matching_dist)
-    np.save(f"results_other/non_matching_gaussian{version}.npy", non_matching_dist)
+    np.save(f"results_mae/matching_gaussian{version}.npy", matching_dist)
+    np.save(f"results_mae/non_matching_gaussian{version}.npy", non_matching_dist)
     
     #here we are calculating the average of both standard devantion means to find threshold 1
     th_mean = (nm_mean+m_mean)/2
     #here we are finding the second threshold
     th_inter = solve(m_mean,nm_mean,m_std,nm_std)
-    # saving results_other in a txt file
-    with open(f"results_other/threshold_{version}.txt", "w+") as file:
+    # saving results_mae in a txt file
+    with open(f"results_mae/threshold_{version}.txt", "w+") as file:
         file.write(f"{th_inter} {th_mean}\n")
-    return th_inter, th_mean 
+    return th_inter, th_mean
 
 
 if __name__ == "__main__":
     '''change the directory containing the dataset below
     '''
-    data_dir = "../student_resampled_wav/" # the path to the directory which contains our vector files
+    data_dir = "../shampled_wav4/train/" # the path to the directory which contains our vector files
     version = 1
     if len(sys.argv) > 1: version = int(sys.argv[1])
     get_threshold(data_dir, version)
